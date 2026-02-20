@@ -1,0 +1,11 @@
+feature,importance
+fare_amount,213
+duration_min,129
+trip_distance,103
+speed_mph,90
+extra,89
+tolls_amount,57
+congestion_surcharge,42
+passenger_count,20
+month_December,18
+hour_Daytime,17

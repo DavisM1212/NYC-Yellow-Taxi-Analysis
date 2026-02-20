@@ -1,0 +1,5 @@
+cluster,fare_amount,tolls_amount,passenger_count,trip_distance,duration_min,speed_mph,tip_rate_pct,is_airport_trip_num
+0,0.79,0.06,2.87,0.66,0.849,0.888,1.011,0.045
+1,0.76,0.03,0.82,0.626,0.821,0.877,1.021,0.018
+2,2.979,13.864,1.048,4.121,2.49,1.98,0.9,9.335
+3,2.758,0.066,0.966,3.708,2.27,1.974,0.742,7.959

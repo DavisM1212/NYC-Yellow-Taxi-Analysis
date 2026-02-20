@@ -1,0 +1,11 @@
+feature,importance
+fare_amount,257
+trip_distance,228
+duration_min,224
+speed_mph,172
+extra,93
+tolls_amount,66
+passenger_count,43
+borough_Queens,35
+weekend,33
+is_airport_trip,28

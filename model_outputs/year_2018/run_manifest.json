@@ -1,0 +1,215 @@
+{
+  "generated_at_utc": "2026-02-19T07:01:49Z",
+  "year": 2018,
+  "target": "tip_amount",
+  "row_counts": {
+    "sample_rows": 250000,
+    "train_rows": 200000,
+    "valid_rows": 50000
+  },
+  "tip_share_pct": {
+    "train": 95.4675,
+    "valid": 95.468
+  },
+  "outlier_summary": {
+    "method": "winsor",
+    "columns_used": [
+      "trip_distance",
+      "duration_min",
+      "speed_mph",
+      "fare_amount",
+      "tolls_amount",
+      "extra"
+    ],
+    "train": {
+      "method": "winsor",
+      "rows_before": 200000,
+      "rows_after": 200000,
+      "rows_removed": 0,
+      "rows_removed_pct": 0.0,
+      "cells_clipped": 4023
+    },
+    "valid": {
+      "method": "winsor",
+      "rows_before": 50000,
+      "rows_after": 50000,
+      "rows_removed": 0,
+      "rows_removed_pct": 0.0,
+      "cells_clipped": 1033
+    }
+  },
+  "prep_summary": {
+    "continuous_n": 5,
+    "low_card_n": 2,
+    "binary_n": 7,
+    "dummy_n": 21,
+    "high_corr_pairs_n": 2,
+    "zero_var_n": 3,
+    "near_zero_var_n": 3,
+    "recommend_scaling": false,
+    "recommended_scaler": "optional_for_linear_models"
+  },
+  "best_models": {
+    "regression": {
+      "model": "optimized_lightgbm_regression",
+      "rmse": 1.2767796014192012,
+      "mae": 0.5491621157107481,
+      "r2": 0.7079811322771375,
+      "fit_seconds": 0.36430539994034916
+    },
+    "classification": {
+      "model": "optimized_random_forest_classifier",
+      "roc_auc": 0.6259301555312905,
+      "avg_precision": 0.9680894140170392,
+      "f1": 0.8945406364391745,
+      "precision": 0.9639192720936985,
+      "recall": 0.8344785687350735,
+      "accuracy": 0.81216,
+      "fit_seconds": 9.449445600039326
+    }
+  },
+  "model_tables": {
+    "regression": [
+      {
+        "model": "optimized_lightgbm_regression",
+        "rmse": 1.2767796014192012,
+        "mae": 0.5491621157107481,
+        "r2": 0.7079811322771375,
+        "fit_seconds": 0.36430539994034916
+      },
+      {
+        "model": "simple_linear_regression",
+        "rmse": 1.281656184328924,
+        "mae": 0.5417959407032177,
+        "r2": 0.7057461752605985,
+        "fit_seconds": 0.07269749999977648
+      },
+      {
+        "model": "naive_mean_tip_regression",
+        "rmse": 2.3627849980404405,
+        "mae": 1.4149981872465969,
+        "r2": -6.321058069458374e-05,
+        "fit_seconds": 0.0
+      }
+    ],
+    "classification": [
+      {
+        "model": "optimized_random_forest_classifier",
+        "roc_auc": 0.6259301555312905,
+        "avg_precision": 0.9680894140170392,
+        "f1": 0.8945406364391745,
+        "precision": 0.9639192720936985,
+        "recall": 0.8344785687350735,
+        "accuracy": 0.81216,
+        "fit_seconds": 9.449445600039326
+      },
+      {
+        "model": "simple_logistic_regression",
+        "roc_auc": 0.5945677522809453,
+        "avg_precision": 0.9630027509460665,
+        "f1": 0.9769198489299202,
+        "precision": 0.9550721447297325,
+        "recall": 0.9997905057191938,
+        "accuracy": 0.9549,
+        "fit_seconds": 2.6124716999474913
+      },
+      {
+        "model": "naive_majority_tip_classifier",
+        "roc_auc": 0.5,
+        "avg_precision": 0.95468,
+        "f1": 0.9768146192727198,
+        "precision": 0.95468,
+        "recall": 1.0,
+        "accuracy": 0.95468,
+        "fit_seconds": 0.0
+      }
+    ]
+  },
+  "tuning": {
+    "lightgbm": {
+      "enabled": true,
+      "trials_run": 40,
+      "tuning_seconds": 19.452710399986245,
+      "best_inner_rmse": 1.1279894695399992
+    },
+    "random_forest": {
+      "enabled": true,
+      "trials_run": 30,
+      "tuning_seconds": 306.06761439994443,
+      "best_inner_auc": 0.6100725666488662,
+      "tune_rows": 150000
+    }
+  },
+  "run_config": {
+    "year": 2018,
+    "target": "tip_amount",
+    "target_rows": 250000,
+    "seed": 42,
+    "valid_frac": 0.2,
+    "outlier_method": "winsor",
+    "outlier_lower": 0.003,
+    "outlier_upper": 0.997,
+    "tune_lgbm": true,
+    "lgbm_optuna_trials": 40,
+    "lgbm_optuna_timeout": null,
+    "tune_rf": true,
+    "rf_optuna_trials": 30,
+    "rf_optuna_timeout": null,
+    "rf_max_tune_rows": 150000,
+    "plot_crop_quantiles": [
+      0.01,
+      0.99
+    ],
+    "plot_crop_padding_frac": 0.03
+  },
+  "export_config": {
+    "save_plots": true,
+    "show_plots": false,
+    "plot_crop_quantiles": [
+      0.01,
+      0.99
+    ],
+    "plot_crop_padding_frac": 0.03,
+    "write_manifest": true,
+    "write_year_report": true
+  },
+  "artifact_files": {
+    "csv": {
+      "regression_model_comparison": "model_outputs/year_2018/regression_model_comparison.csv",
+      "classification_model_comparison": "model_outputs/year_2018/classification_model_comparison.csv",
+      "baseline_model_summary": "model_outputs/year_2018/baseline_model_summary.csv",
+      "simple_linear_coefficients": "model_outputs/year_2018/simple_linear_coefficients.csv",
+      "simple_logistic_coefficients": "model_outputs/year_2018/simple_logistic_coefficients.csv",
+      "optimized_lgbm_feature_importance": "model_outputs/year_2018/optimized_lgbm_feature_importance.csv",
+      "optimized_rf_feature_importance": "model_outputs/year_2018/optimized_rf_feature_importance.csv",
+      "naive_regression_predictions": "model_outputs/year_2018/naive_regression_predictions.csv",
+      "simple_linear_predictions": "model_outputs/year_2018/simple_linear_predictions.csv",
+      "optimized_lgbm_predictions": "model_outputs/year_2018/optimized_lgbm_predictions.csv",
+      "naive_classification_predictions": "model_outputs/year_2018/naive_classification_predictions.csv",
+      "simple_logistic_predictions": "model_outputs/year_2018/simple_logistic_predictions.csv",
+      "optimized_rf_predictions": "model_outputs/year_2018/optimized_rf_predictions.csv",
+      "interpretation_linear_positive": "model_outputs/year_2018/interpretation_linear_positive.csv",
+      "interpretation_linear_negative": "model_outputs/year_2018/interpretation_linear_negative.csv",
+      "interpretation_logistic_positive": "model_outputs/year_2018/interpretation_logistic_positive.csv",
+      "interpretation_logistic_negative": "model_outputs/year_2018/interpretation_logistic_negative.csv",
+      "interpretation_lgb_importance_top": "model_outputs/year_2018/interpretation_lgb_importance_top.csv",
+      "interpretation_rf_importance_top": "model_outputs/year_2018/interpretation_rf_importance_top.csv",
+      "outlier_summary_flat": "model_outputs/year_2018/outlier_summary_flat.csv",
+      "year_summary": "model_outputs/year_2018/year_summary.csv"
+    },
+    "plots": {
+      "naive_mean_tip_regression": "model_outputs/year_2018/naive_mean_tip_regression_diagnostics.png",
+      "simple_linear_regression": "model_outputs/year_2018/simple_linear_regression_diagnostics.png",
+      "optimized_lightgbm_regression": "model_outputs/year_2018/optimized_lightgbm_regression_diagnostics.png"
+    }
+  },
+  "library_versions": {
+    "python": "3.14.0",
+    "duckdb": "1.4.4",
+    "optuna": "4.7.0",
+    "numpy": "2.3.5",
+    "pandas": "2.3.3",
+    "matplotlib": "3.10.8",
+    "seaborn": "0.13.2"
+  }
+}

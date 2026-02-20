@@ -1,0 +1,5 @@
+# Caches
+__pycache__/
+
+# Parquet files
+*.parquet

@@ -1,0 +1,11 @@
+feature,importance
+fare_amount,967
+duration_min,412
+speed_mph,295
+trip_distance,295
+extra,293
+tolls_amount,228
+congestion_surcharge,148
+improvement_surcharge,111
+hour_Daytime,92
+borough_Queens,79

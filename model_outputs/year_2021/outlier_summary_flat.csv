@@ -1,0 +1,2 @@
+method,columns_used,train_method,train_rows_before,train_rows_after,train_rows_removed,train_rows_removed_pct,train_cells_clipped,valid_method,valid_rows_before,valid_rows_after,valid_rows_removed,valid_rows_removed_pct,valid_cells_clipped
+winsor,"['trip_distance', 'duration_min', 'speed_mph', 'fare_amount', 'tolls_amount', 'extra']",winsor,200000,200000,0,0.0,5054,winsor,50000,50000,0,0.0,1210

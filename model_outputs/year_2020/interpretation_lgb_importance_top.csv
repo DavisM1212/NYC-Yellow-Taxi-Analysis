@@ -1,0 +1,11 @@
+feature,importance
+speed_mph,181
+fare_amount,178
+duration_min,145
+trip_distance,133
+extra,74
+congestion_surcharge,52
+tolls_amount,49
+rate_code,32
+is_airport_trip,25
+hour_Daytime,22

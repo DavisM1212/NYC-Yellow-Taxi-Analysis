@@ -1,0 +1,11 @@
+feature,importance
+fare_amount,1252
+duration_min,861
+trip_distance,677
+speed_mph,652
+tolls_amount,474
+extra,350
+passenger_count,194
+is_airport_trip,162
+hour_Daytime,115
+weekend,107

@@ -1,0 +1,5 @@
+cluster,persona,tip_rate_pct,tip_rank,cluster_share_pct,comment
+1,Core Manhattan Mixed Trips,26.6715,1,81.1563,Highest tip propensity
+0,Group-Cab City Movers,26.4131,2,7.71704,"Mid-tier tip propensity, group-passenger segment"
+2,Airport Connector Long-Haul,23.5143,3,6.9835400000000005,"Mid-tier tip propensity, airport-driven"
+3,Airport Connector Long-Haul,19.3924,4,4.14312,"Lowest tip propensity, airport-driven"

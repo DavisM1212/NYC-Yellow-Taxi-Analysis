@@ -1,0 +1,11 @@
+feature,importance
+fare_amount,147
+duration_min,58
+tolls_amount,45
+extra,36
+trip_distance,32
+speed_mph,23
+is_airport_trip,16
+weekend,10
+borough_Manhattan,10
+rate_code,8

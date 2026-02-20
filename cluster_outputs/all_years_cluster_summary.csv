@@ -1,0 +1,4 @@
+year,sample_rows,selected_k,k_select_metric,k_select_metric_value,inertia,cluster_count,top_cluster_tip_rate_pct,bottom_cluster_tip_rate_pct
+2015,5000000,4,manual_k,4.0,15965649.993986815,4,22.43,16.5166
+2020,5000000,4,manual_k,4.0,15838589.765635801,4,30.7432,18.2671
+2022,5000000,4,manual_k,4.0,16206089.230630774,4,26.6712,19.3948

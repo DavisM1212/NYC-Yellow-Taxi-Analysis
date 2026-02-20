@@ -1,0 +1,3 @@
+model,fit_seconds,rmse,mae,r2,roc_auc,avg_precision,f1,precision,recall,accuracy
+naive_mean_tip_regression,0.0,2.5872485686875897,1.534833670595767,-2.255125815509018e-05,,,,,,
+naive_majority_tip_classifier,0.0,,,,0.5,0.96646,0.9829439703833284,0.96646,1.0,0.96646

@@ -1,0 +1,7 @@
+column,lower_quantile,upper_quantile,lower_bound,upper_bound
+fare_amount,0.003,0.997,3.5,52.0
+tolls_amount,0.003,0.997,0.0,5.54
+trip_distance,0.003,0.997,0.25,20.799999237060547
+duration_min,0.003,0.997,1.4299999475479126,66.87000274658203
+speed_mph,0.003,0.997,2.369999885559082,40.2599983215332
+tip_rate_pct,0.003,0.997,0.0,58.53658318519592

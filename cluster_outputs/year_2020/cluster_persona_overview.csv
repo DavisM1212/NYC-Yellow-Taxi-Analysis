@@ -1,0 +1,5 @@
+cluster,persona,tip_rate_pct,tip_rank,cluster_share_pct,comment
+0,High-Tipping Local Errands,28.5635,1,66.32364,"Highest tip propensity, short-hop urban core"
+2,Group-Cab City Movers,27.0332,2,9.31578,"Mid-tier tip propensity, group-passenger segment"
+1,Airport Connector Long-Haul,21.6609,3,5.0316399999999994,"Mid-tier tip propensity, airport-driven"
+3,Lower-Tip Mid-Range Trips,19.0436,4,19.32894,"Lowest tip propensity, mixed-value longer hauls"
