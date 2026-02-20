@@ -3,3 +3,4 @@ __pycache__/
 
 # Parquet files
 *.parquet
+!taxi_zones_4326.parquet
