@@ -13,6 +13,7 @@ End-to-end data science pipeline for analyzing NYC TLC yellow taxi trips and ide
 - [Data Scope and Scale](#data-scope-and-scale)
 - [End-to-End Pipeline](#end-to-end-pipeline)
 - [Repository Workflow](#repository-workflow)
+- [Interactive Heatmap](#interactive-heatmap)
 - [Modeling Design](#modeling-design)
 - [Results at a Glance (2015-2022)](#results-at-a-glance-2015-2022)
 - [Recurring Feature Signals](#recurring-feature-signals)
@@ -210,6 +211,13 @@ Run:
 python heatmap_clean.py
 python interactive_heatmap.py
 ```
+
+## Interactive Heatmap
+The project includes an interactive borough/zone tip-rate map built from cleaned yearly data and rendered with Folium for exploratory geographic storytelling.
+
+- Hosted demo: https://davism1212.github.io/NYC-Yellow-Taxi-Tipping-Trends-2015-2022/index.html
+
+![Interactive NYC yellow taxi tip heatmap demo](heatmap_demo.png)
 
 ### 5) Modeling and reporting
 Main script: `tip_modeling.py`
