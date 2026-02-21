@@ -217,7 +217,7 @@ The project includes an interactive borough/zone tip-rate map built from cleaned
 
 - Hosted demo: https://davism1212.github.io/NYC-Yellow-Taxi-Tipping-Trends-2015-2022/index.html
 
-![Interactive NYC yellow taxi tip heatmap demo](heatmap_demo.png)
+![Interactive NYC yellow taxi tip heatmap demo](ref/heatmap_demo.png)
 
 ### 5) Modeling and reporting
 Main script: `tip_modeling.py`
