@@ -1,4 +1,9 @@
-import calendar, json, pathlib, time, duckdb
+import calendar
+import json
+import pathlib
+import time
+
+import duckdb
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -6,8 +11,9 @@ from sklearn.cluster import KMeans, MiniBatchKMeans
 from sklearn.metrics import calinski_harabasz_score, silhouette_score
 from sklearn.preprocessing import StandardScaler
 
-PARQUET_DIR = "./taxi_parquets"
-ARTIFACT_ROOT_DIR = "./cluster_outputs"
+PROJECT_ROOT = pathlib.Path(__file__).resolve().parent
+PARQUET_DIR = PROJECT_ROOT / "taxi_parquets"
+ARTIFACT_ROOT_DIR = PROJECT_ROOT / "cluster_outputs"
 VALID_YEARS = set(range(2015, 2023))
 DEFAULT_SAMPLE_COLUMNS = [
     "fare_amount",
@@ -77,7 +83,7 @@ def _validate_year(year):
 
 
 def _parquet_path_for_year(year):
-    return pathlib.Path(PARQUET_DIR, f"yellow_clean_{year}.parquet").as_posix()
+    return (PARQUET_DIR / f"yellow_clean_{year}.parquet").as_posix()
 
 
 def _connect_duckdb():
@@ -463,9 +469,9 @@ def select_k(metrics_df, method=DEFAULT_K_SELECT_METHOD, min_k_for_auto=DEFAULT_
         best_row = score_df.loc[best_idx]
         return int(best_row["k"]), metric_col, float(best_row[metric_col]), score_df
 
-    best_idx = use_df[metric_col].idxmax()
+    best_idx = use_df[metric_col].idxmax() # type: ignore
     best_row = use_df.loc[best_idx]
-    return int(best_row["k"]), metric_col, float(best_row[metric_col]), use_df
+    return int(best_row["k"]), metric_col, float(best_row[metric_col]), use_df # type: ignore
 
 
 def plot_k_selection(metrics_df, out_path=None, show_plot=False):
@@ -556,8 +562,7 @@ def _build_behavioral_summary(df, behavioral_cols):
 def _build_descriptive_summary(df, descriptive_cols):
     if len(descriptive_cols) == 0:
         return pd.DataFrame(index=sorted(df["cluster"].unique()))
-    desc = (df.groupby("cluster")[descriptive_cols].mean() * 100.0).round(2)
-    return desc
+    return (df.groupby("cluster")[descriptive_cols].mean() * 100.0).round(2)
 
 
 def _build_category_mix(df, category_col):
@@ -568,8 +573,7 @@ def _build_category_mix(df, category_col):
         .rename("pct")
         .reset_index()
     )
-    wide = mix.pivot(index="cluster", columns=category_col, values="pct").fillna(0.0).round(2)
-    return wide
+    return mix.pivot(index="cluster", columns=category_col, values="pct").fillna(0.0).round(2)
 
 
 def _build_top_zones(df, zone_col, top_n=10):
@@ -660,16 +664,14 @@ def _top_pct_lines(row, prefix, top_n=3):
     if len(cols) == 0:
         return []
     s = row[cols].sort_values(ascending=False).head(top_n)
-    lines = [f"{c.replace(prefix, '')}: {float(v):.2f}%" for c, v in s.items()]
-    return lines
+    return [f"{c.replace(prefix, '')}: {float(v):.2f}%" for c, v in s.items()]
 
 
 def _top_mix_lines(mix_df, cluster, top_n=2):
     if cluster not in mix_df.index:
         return []
     s = pd.to_numeric(mix_df.loc[cluster], errors="coerce").sort_values(ascending=False).head(top_n)
-    lines = [f"{str(k)}: {float(v):.2f}%" for k, v in s.items()]
-    return lines
+    return [f"{str(k)}: {float(v):.2f}%" for k, v in s.items()]
 
 
 def _top_zones_for_cluster(top_zone_long_df, cluster, zone_col, top_n=5):
@@ -725,8 +727,7 @@ def build_cluster_persona_overview(summary_tables):
             }
         )
 
-    out = pd.DataFrame(rows).sort_values(["tip_rank", "cluster"]).reset_index(drop=True)
-    return out
+    return pd.DataFrame(rows).sort_values(["tip_rank", "cluster"]).reset_index(drop=True)
 
 
 def build_cluster_personas_markdown(year, run_config, summary_tables, persona_overview):
@@ -1206,7 +1207,7 @@ def run_behavioral_clustering_exports(
         show_plot=False,
         verbose=True):
     summary_rows = []
-    for year in sorted(list(years)):
+    for year in sorted(years):
         if verbose:
             print("\n" + "=" * 72)
             print(f"Running behavioral clustering export for year {year}")

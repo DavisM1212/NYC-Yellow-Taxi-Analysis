@@ -1,18 +1,35 @@
-import calendar, json, pathlib, sys, time, duckdb, optuna
+import calendar
+import json
+import pathlib
+import sys
+import time
+
+import duckdb
 import matplotlib.pyplot as plt
 import numpy as np
+import optuna
 import pandas as pd
 import scipy.stats as stats
 import seaborn as sns
 from lightgbm import LGBMRegressor, early_stopping
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LinearRegression, LogisticRegression
-from sklearn.metrics import accuracy_score, average_precision_score, f1_score, mean_absolute_error, mean_squared_error
-from sklearn.metrics import precision_score, r2_score, recall_score, roc_auc_score
+from sklearn.metrics import (
+    accuracy_score,
+    average_precision_score,
+    f1_score,
+    mean_absolute_error,
+    mean_squared_error,
+    precision_score,
+    r2_score,
+    recall_score,
+    roc_auc_score,
+)
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
-PARQUET_DIR = "./taxi_parquets"
+PROJECT_ROOT = pathlib.Path(__file__).resolve().parent
+PARQUET_DIR = PROJECT_ROOT / "taxi_parquets"
 VALID_YEARS = set(range(2015, 2023))
 VALID_TARGETS = {"tip_amount", "tip_rate", "log_tip"}
 DUMMY_PREFIXES = ("hour_", "month_", "borough_")
@@ -34,7 +51,7 @@ DEFAULT_RF_PARAMS = {
     "class_weight": "balanced_subsample",
     "criterion": "gini"
 }
-ARTIFACT_ROOT_DIR = "./model_outputs"
+ARTIFACT_ROOT_DIR = PROJECT_ROOT / "model_outputs"
 REG_PLOT_MAX_POINTS = 20_000
 DEFAULT_REG_PLOT_CROP_QUANTILES = (0.01, 0.99)
 DEFAULT_REG_PLOT_CROP_PADDING_FRAC = 0.03
@@ -99,7 +116,7 @@ def _validate_target(target):
 
 
 def _parquet_path_for_year(year):
-    return pathlib.Path(PARQUET_DIR, f"yellow_clean_{year}.parquet").as_posix()
+    return (PARQUET_DIR / f"yellow_clean_{year}.parquet").as_posix()
 
 
 def _connect_duckdb():
@@ -599,8 +616,7 @@ def feature_target_correlations(X, y):
 
     corr_df["abs_pearson"] = corr_df["pearson_corr"].abs()
     corr_df["abs_spearman"] = corr_df["spearman_corr"].abs()
-    corr_df = corr_df.sort_values(["abs_spearman", "abs_pearson"], ascending=False).reset_index(drop=True)
-    return corr_df
+    return corr_df.sort_values(["abs_spearman", "abs_pearson"], ascending=False).reset_index(drop=True)
 
 
 # -----------------------------------------------------------------------------
@@ -838,8 +854,7 @@ def choose_log1p_columns(X_train, prep_report=None):
 
 def choose_near_zero_columns(X_train, threshold=1e-4):
     variances = X_train.var(numeric_only=True)
-    near_zero_cols = variances[(variances > 0) & (variances <= threshold)].index.tolist()
-    return near_zero_cols
+    return variances[(variances > 0) & (variances <= threshold)].index.tolist()
 
 
 def choose_high_corr_drop_columns(X_train, prep_report=None, corr_threshold=0.9):
@@ -1163,7 +1178,7 @@ def tune_lightgbm_regressor(
             callbacks=[early_stopping(stopping_rounds=early_stop_rounds, verbose=False)]
         )
         y_pred = model.predict(X_tune_valid)
-        rmse = float(np.sqrt(mean_squared_error(y_tune_valid, y_pred)))
+        rmse = float(np.sqrt(mean_squared_error(y_tune_valid, y_pred))) # type: ignore
         trial.set_user_attr("best_iteration", int(model.best_iteration_) if model.best_iteration_ else np.nan)
         return rmse
 
@@ -1977,7 +1992,7 @@ def build_year_summary_row(year, package, model_suite):
     opt_reg_summary = model_suite["optimized_regression"]["summary"]
     opt_rf_summary = model_suite["optimized_random_forest"]["summary"]
 
-    row = {
+    return {
         "year": int(year),
         "target": package.get("target", "tip_amount"),
         "sample_rows": int(len(package["X"])),
@@ -2006,7 +2021,6 @@ def build_year_summary_row(year, package, model_suite):
         "opt_rf_tuned": bool(opt_rf_summary.get("tuned_with_optuna", False)),
         "opt_rf_trials": int(opt_rf_summary.get("optuna_trials_run", 0))
     }
-    return row
 
 
 def _to_builtin(value):
@@ -2133,8 +2147,8 @@ def build_run_manifest(
             "optuna": optuna.__version__,
             "numpy": np.__version__,
             "pandas": pd.__version__,
-            "matplotlib": plt.matplotlib.__version__,
-            "seaborn": sns.__version__
+            "matplotlib": plt.matplotlib.__version__, # type: ignore
+            "seaborn": sns.__version__ # type: ignore
         }
     }
     return _to_builtin(manifest)
@@ -2392,7 +2406,7 @@ def run_yearly_modeling_exports(
         write_manifest=True,
         write_year_report=True,
         verbose=True):
-    years = sorted(list(years))
+    years = sorted(years)
     summary_rows = []
 
     for year in years:
@@ -2600,7 +2614,7 @@ def build_eda_dataset(
 
     print(f"Train size after outlier step: {len(X_train):,} | Valid size after outlier step: {len(X_valid):,}")
 
-    package = {
+    return {
         "target": target,
         "full_df": model_df,
         "X": X,
@@ -2613,7 +2627,6 @@ def build_eda_dataset(
         "outlier_bounds": outlier_bounds,
         "outlier_summary": outlier_summary
     }
-    return package
 
 
 if __name__ == "__main__":

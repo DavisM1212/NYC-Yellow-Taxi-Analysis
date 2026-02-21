@@ -1,12 +1,14 @@
-import os, glob, pathlib
+import pathlib
+
 import pyarrow as pa
 import pyarrow.compute as pc
 import pyarrow.dataset as ds
 import pyarrow.parquet as pq
 
-SRC_ROOT = "./taxi_parquet_cache"     # monthly parquets location
-OUT_ROOT = "./taxi_parquets"     # where to write yearly parquets
-os.makedirs(OUT_ROOT, exist_ok=True)
+PROJECT_ROOT = pathlib.Path(__file__).resolve().parent
+SRC_ROOT = PROJECT_ROOT / "taxi_parquet_cache"     # monthly parquets location
+OUT_ROOT = PROJECT_ROOT / "taxi_parquets"     # where to write yearly parquets
+OUT_ROOT.mkdir(parents=True, exist_ok=True)
 
 YEARS = range(2015, 2023)
 
@@ -68,12 +70,12 @@ def _cast_table_to(table: pa.Table, target_schema: pa.Schema):
     return pa.Table.from_arrays(cols, schema=target_schema)
 
 def combine_year_stream(year):
-    month_glob = os.path.join(SRC_ROOT, str(year), f"yellow_tripdata_{year}-*.parquet")
-    files = sorted(glob.glob(month_glob))
+    month_dir = SRC_ROOT / str(year)
+    files = sorted(month_dir.glob(f"yellow_tripdata_{year}-*.parquet"))
     if not files:
-        raise FileNotFoundError(f"No Parquet files found for {year} at {month_glob}")
+        raise FileNotFoundError(f"No Parquet files found for {year} at {month_dir}")
 
-    out_path = pathlib.Path(OUT_ROOT, f"yellow_year_{year}.parquet").as_posix()
+    out_path = (OUT_ROOT / f"yellow_year_{year}.parquet").as_posix()
 
     # Build a dataset across all month files
     dataset = ds.dataset(files, format="parquet")
@@ -88,7 +90,7 @@ def combine_year_stream(year):
     try:
         # Stream month-by-month
         for f in files:
-            part_ds = ds.dataset([f], format="parquet")
+            part_ds = ds.dataset([str(f)], format="parquet")
             # Read batches for this file
             for batch in part_ds.to_batches(columns=KEEP_COLS, batch_size=BATCH_ROWS):
                 total_in += batch.num_rows
@@ -108,5 +110,6 @@ def combine_year_stream(year):
     out_rows = pq.ParquetFile(out_path).metadata.num_rows
     print(f"{year}: wrote {out_path}  rows_in≈{total_in:,}  rows_out={out_rows:,}")
 
-for y in YEARS:
-    combine_year_stream(y)
+if __name__ == "__main__":
+    for y in YEARS:
+        combine_year_stream(y)

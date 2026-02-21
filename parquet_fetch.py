@@ -1,10 +1,14 @@
-import time, os, requests
+import time
+from pathlib import Path
 from urllib.parse import urlparse
+
+import requests
 
 BASE = "https://d37ci6vzurychx.cloudfront.net/trip-data"
 UA = "NYC-Taxi-Student-Project (contact: ********@********.***)"
-CACHE_DIR = "./taxi_parquet_cache"
-os.makedirs(CACHE_DIR, exist_ok=True)
+PROJECT_ROOT = Path(__file__).resolve().parent
+CACHE_DIR = PROJECT_ROOT / "taxi_parquet_cache"
+CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def year_urls(year):
@@ -12,11 +16,11 @@ def year_urls(year):
 
 
 def cache_path_for(url):
-    name = os.path.basename(urlparse(url).path)
+    name = Path(urlparse(url).path).name
     year = name.split("_")[-1].split("-")[0]
-    d = os.path.join(CACHE_DIR, year)
-    os.makedirs(d, exist_ok=True)
-    return os.path.join(d, name)
+    d = CACHE_DIR / year
+    d.mkdir(parents=True, exist_ok=True)
+    return d / name
 
 
 def head_size(url, timeout=15):
@@ -34,7 +38,10 @@ def download_with_backoff(url, dst_path, max_retries=6, base_sleep=2.0):
             with requests.get(url, headers={"User-Agent": UA}, stream=True, timeout=30) as r:
                 if r.status_code in (403, 429):
                     retry_after = r.headers.get("Retry-After")
-                    wait = float(retry_after) if (retry_after and retry_after.isdigit()) else base_sleep * (2 ** attempt) + (0.5 * attempt)
+                    if retry_after and retry_after.isdigit():
+                        wait = float(retry_after)
+                    else:
+                        wait = base_sleep * (2 ** attempt) + (0.5 * attempt)
                     attempt += 1
                     if attempt > max_retries:
                         raise RuntimeError(f"Exceeded retries for {url} (HTTP {r.status_code})")
@@ -43,13 +50,13 @@ def download_with_backoff(url, dst_path, max_retries=6, base_sleep=2.0):
                     continue
 
                 r.raise_for_status()
-                tmp = dst_path + ".part"
+                tmp = dst_path.with_suffix(dst_path.suffix + ".part")
                 # Write to a temp file first, then atomically move into place
-                with open(tmp, "wb") as f:
+                with tmp.open("wb") as f:
                     for chunk in r.iter_content(chunk_size=1024 * 1024):
                         if chunk:
                             f.write(chunk)
-                os.replace(tmp, dst_path)
+                tmp.replace(dst_path)
                 return
         except requests.RequestException as e:
             attempt += 1
@@ -72,19 +79,19 @@ def fetch_year_with_throttle(year, min_sleep_between_files=6.0, max_mb_per_min=5
             size_remote = None
 
         # If local file size matches HEAD metadata, reuse cache and skip GET
-        if os.path.exists(dst):
-            size_local = os.path.getsize(dst)
+        if dst.exists():
+            size_local = dst.stat().st_size
             if size_remote is None or size_local == size_remote:
                 print(f"[cache] Using {dst} ({size_local/1e6:.1f} MB)")
-                files.append(dst)
+                files.append(dst.as_posix())
                 continue
 
         t0 = time.time()
         print(f"[get ] {url}")
         download_with_backoff(url, dst)
         dt = time.time() - t0
-        size_local = os.path.getsize(dst)
-        files.append(dst)
+        size_local = dst.stat().st_size
+        files.append(dst.as_posix())
         total_bytes += size_local
         print(f"[done] {dst} {size_local/1e6:.1f} MB in {dt:.1f}s")
 
@@ -99,6 +106,7 @@ def fetch_year_with_throttle(year, min_sleep_between_files=6.0, max_mb_per_min=5
     return files
 
 
-# Adjust year range as needed for full historical pulls
-for y in range(2016, 2023):
-    parquet_list = fetch_year_with_throttle(y)
+if __name__ == "__main__":
+    # Adjust year range as needed for full historical pulls
+    for y in range(2016, 2023):
+        parquet_list = fetch_year_with_throttle(y)

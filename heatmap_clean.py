@@ -1,8 +1,11 @@
-import duckdb, os, pathlib
+import pathlib
+
+import duckdb
 import pandas as pd
 
-ZONES_SHAPE = "./taxi_zones_4326.parquet"
-PARQUET_DIR = "./taxi_parquets"
+PROJECT_ROOT = pathlib.Path(__file__).resolve().parent
+ZONES_SHAPE = PROJECT_ROOT / "taxi_parquets" / "taxi_zones_4326.parquet"
+PARQUET_DIR = PROJECT_ROOT / "taxi_parquets"
 
 
 def build_heatmap_year(year, zones_path, out_dir):
@@ -10,7 +13,8 @@ def build_heatmap_year(year, zones_path, out_dir):
     if year < 2015 or year > 2022:
         raise ValueError("year must be in 2015..2022")
 
-    parquet_path = pathlib.Path(PARQUET_DIR,   f"yellow_clean_{year}.parquet").as_posix()
+    parquet_path = (PARQUET_DIR / f"yellow_clean_{year}.parquet").as_posix()
+    zones_parquet = pathlib.Path(zones_path).as_posix()
 
     con = duckdb.connect()
     try:
@@ -27,7 +31,7 @@ def build_heatmap_year(year, zones_path, out_dir):
         CAST(borough AS VARCHAR) AS borough,
         CAST(zone_name AS VARCHAR) AS zone_name,
         CAST(wkt AS VARCHAR)    AS wkt
-      FROM read_parquet('{zones_path}')
+      FROM read_parquet('{zones_parquet}')
     ),
 
     -- Trip-level base rates with a minimum-fare guardrail for stable tip rate stats
@@ -112,8 +116,9 @@ def build_heatmap_year(year, zones_path, out_dir):
 
 
     # Write per-year CSV with WKT retained for downstream map joins
-    os.makedirs(out_dir, exist_ok=True)
-    out_path = os.path.join(out_dir, f"heat_{year}.csv")
+    out_dir = pathlib.Path(out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    out_path = out_dir / f"heat_{year}.csv"
     df.to_csv(out_path, index=False)
     print(f"[{year}] wrote {out_path}  ({len(df)} zones)")
     return df
@@ -121,4 +126,4 @@ def build_heatmap_year(year, zones_path, out_dir):
 if __name__ == "__main__":
     dfs = {}
     for y in range(2015, 2023):
-        dfs[y] = build_heatmap_year(y, zones_path=ZONES_SHAPE, out_dir="./heatmaps")
+        dfs[y] = build_heatmap_year(y, zones_path=ZONES_SHAPE, out_dir=PROJECT_ROOT / "heatmaps")

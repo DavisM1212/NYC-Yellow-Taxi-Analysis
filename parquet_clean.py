@@ -1,10 +1,13 @@
-import duckdb, os, pathlib
+import pathlib
+
+import duckdb
 
 # Paths
-YEARLY_DIR = "./taxi_parquets"
-ZONES_PATH  = "./taxi_zones_4326.parquet"
-OUT_DIR    = "./taxi_parquets"
-os.makedirs(OUT_DIR, exist_ok=True)
+PROJECT_ROOT = pathlib.Path(__file__).resolve().parent
+YEARLY_DIR = PROJECT_ROOT / "taxi_parquets"
+ZONES_PATH  = YEARLY_DIR / "taxi_zones_4326.parquet"
+OUT_DIR    = PROJECT_ROOT / "taxi_parquets"
+OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 YEARS = range(2015, 2023)
 
@@ -231,12 +234,12 @@ def clean_year_with_duckdb(year , row_group=256_000):
     for p in PRAGMAS:
         con.execute(p)
 
-    yearly_parquet = pathlib.Path(YEARLY_DIR, f"yellow_year_{year}.parquet").as_posix()
-    out_parquet    = pathlib.Path(OUT_DIR,   f"yellow_clean_{year}.parquet").as_posix()
+    yearly_parquet = (YEARLY_DIR / f"yellow_year_{year}.parquet").as_posix()
+    out_parquet    = (OUT_DIR / f"yellow_clean_{year}.parquet").as_posix()
 
     sql = SQL_TEMPLATE.format(
         pragmas=";\n".join(PRAGMAS)+";",
-        zones_path=ZONES_PATH,
+        zones_path=ZONES_PATH.as_posix(),
         yearly_parquet=yearly_parquet,
         year=year,
         INITIAL_DEFAULT = INITIAL_DEFAULT,
@@ -264,5 +267,6 @@ def clean_year_with_duckdb(year , row_group=256_000):
     print(f"{year}: wrote {out_parquet}  rows={n:,}")
     con.close()
 
-for y in YEARS:
-    clean_year_with_duckdb(y, row_group=256_000)
+if __name__ == "__main__":
+  for y in YEARS:
+      clean_year_with_duckdb(y, row_group=256_000)

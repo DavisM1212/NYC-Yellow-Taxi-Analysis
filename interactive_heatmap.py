@@ -1,21 +1,26 @@
-import folium, webbrowser, os, json
-import pandas as pd
+import json
+import webbrowser
+from pathlib import Path
+
+import folium
 import geopandas as gpd
+import numpy as np
+import pandas as pd
+from branca.colormap import linear
 from shapely import wkt
 from shapely.geometry import mapping
-import numpy as np
-from branca.colormap import linear
 
+PROJECT_ROOT = Path(__file__).resolve().parent
 
 # Load per-year CSVs
 # -----------------------------------------------------------------------------
 YEARS = list(range(2015, 2023))
-paths = {y: f"./heatmaps/heat_{y}.csv" for y in YEARS}
+paths = {y: (PROJECT_ROOT / "heatmaps" / f"heat_{y}.csv").as_posix() for y in YEARS}
 
 gdfs = {}
 for y in YEARS:
     df = pd.read_csv(paths[y])
-    gdf = gpd.GeoDataFrame(df, geometry=df["wkt"].apply(wkt.loads), crs="EPSG:4326")
+    gdf = gpd.GeoDataFrame(df, geometry=df["wkt"].apply(wkt.loads), crs="EPSG:4326") # type: ignore
     count_col = "num_trips" if "num_trips" in gdf.columns else "num_tips"
 
     gdf["year"] = y
@@ -73,17 +78,17 @@ metrics = ["avg_tip", "med_tip", "avg_rate"]
 ranges = {}
 for m in metrics:
     all_vals = pd.concat([gdfs[y][m] for y in YEARS], ignore_index=True)
-    ranges[m] = robust_range(all_vals, is_rate=(m == "avg_rate"))
+    ranges[m] = robust_range(all_vals, is_rate=(m == "avg_rate")) # type: ignore
 
 
 # Palettes and legends
 # -----------------------------------------------------------------------------
-PALETTES = {m: linear.RdYlGn_11.scale(*ranges[m]) for m in metrics}
+PALETTES = {m: linear.RdYlGn_11.scale(*ranges[m]) for m in metrics} # type: ignore
 
 
 def make_continuous_legend_html(caption, vmin, vmax, *, n_ticks=7, money_mode=True, palette=None):
     if palette is None:
-        palette = linear.RdYlGn_11.scale(vmin, vmax)
+        palette = linear.RdYlGn_11.scale(vmin, vmax) # type: ignore
 
     grad_vals = np.linspace(vmin, vmax, 64)
     grad_css = ", ".join(palette(v) for v in grad_vals)
@@ -201,19 +206,19 @@ for y in YEARS:
     YEAR_TO_VARNAME[str(y)] = fg.get_name()
 
 # Initial legend for default metric
-m.get_root().html.add_child(folium.Element(legend_for_metric[default_metric]))
+m.get_root().html.add_child(folium.Element(legend_for_metric[default_metric])) # type: ignore
 
 # Radio panels (Metric and Years)
 # -----------------------------------------------------------------------------
 controls_html = """
 <div id="control-stack" style="
-  position: fixed; 
-  top: 58px;           
-  right: 12px; 
+  position: fixed;
+  top: 58px;
+  right: 12px;
   z-index: 9999;
   display: flex;
   flex-direction: column;
-  gap: 10px;           
+  gap: 10px;
 ">
   <!-- Metric panel -->
   <div class="control-box">
@@ -296,7 +301,7 @@ year_radios = "".join(
     for y in YEARS
 )
 
-m.get_root().html.add_child(folium.Element(controls_html.format(year_radios=year_radios)))
+m.get_root().html.add_child(folium.Element(controls_html.format(year_radios=year_radios))) # type: ignore
 
 
 # Help button and overlay
@@ -435,7 +440,7 @@ help_html = """
 </style>
 """
 
-m.get_root().html.add_child(folium.Element(help_html))
+m.get_root().html.add_child(folium.Element(help_html)) # type: ignore
 
 
 # Main JS toggler; recolor by metrics, highlighting, etc
@@ -503,7 +508,7 @@ function recolorLayerByMetric(lyr, metric) {
   applyToLayer(lyr);
 }
 
-// Attach custom hover handlers 
+// Attach custom hover handlers
 function attachHighlightHandlers(lyr) {
   if (!lyr || !lyr.eachLayer) return;
 
@@ -587,7 +592,7 @@ js = (
       .replace("__INIT_YEAR__", init_year)
 )
 
-m.get_root().html.add_child(folium.Element(js))
+m.get_root().html.add_child(folium.Element(js)) # type: ignore
 
 
 # Help overlay wiring
@@ -624,7 +629,7 @@ window.addEventListener('load', function() {
 </script>
 """
 
-m.get_root().html.add_child(folium.Element(help_js))
+m.get_root().html.add_child(folium.Element(help_js)) # type: ignore
 
 
 # Title
@@ -650,11 +655,11 @@ title_html = f"""
     {map_title}
 </div>
 """
-m.get_root().html.add_child(folium.Element(title_html))
+m.get_root().html.add_child(folium.Element(title_html)) # type: ignore
 
 
 # Save and open
 # -----------------------------------------------------------------------------
-out = os.path.abspath("tips_map_slim.html")
+out = str((PROJECT_ROOT / "tips_map_slim.html").resolve())
 m.save(out)
 webbrowser.open(f"file://{out}")

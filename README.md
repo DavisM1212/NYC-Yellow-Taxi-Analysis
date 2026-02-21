@@ -105,7 +105,7 @@ Notes:
 - NYC TLC Trip Record Data (official portal): https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page
 - Monthly yellow taxi parquet endpoint (used by the fetch script):  
   `https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_YYYY-MM.parquet`
-- Taxi zone lookup and shapes (from TLC trip data portal resources), converted locally to `taxi_zones_4326.parquet` and already provided for use
+- Taxi zone lookup and shapes (from TLC trip data portal resources), converted locally to `taxi_parquets/taxi_zones_4326.parquet` and already provided for use
 - Fare and surcharge reference used for meter validation logic: https://www.nyc.gov/site/tlc/passengers/taxi-fare.page
 - 2022 fare-rule change reference: https://rules.cityofnewyork.us/rule/taximeter-rate-of-fare-and-various-surcharges/
 
