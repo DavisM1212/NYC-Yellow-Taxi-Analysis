@@ -215,7 +215,7 @@ python interactive_heatmap.py
 ## Interactive Heatmap
 The project includes an interactive borough/zone tip-rate map built from cleaned yearly data and rendered with Folium for exploratory geographic storytelling.
 
-- Hosted demo: https://davism1212.github.io/NYC-Yellow-Taxi-Tipping-Trends-2015-2022/index.html
+- Hosted demo: https://davism1212.github.io/NYC-Yellow-Taxi-Analysis/
 
 ![Interactive NYC yellow taxi tip heatmap demo](docs/heatmap_demo.png)
 
